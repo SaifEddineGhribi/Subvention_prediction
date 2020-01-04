@@ -1,6 +1,6 @@
 # RAMP starting kit on the prediction of subventions allocated to projects in Paris
 
-**Authors: Angelo CANESSO - Enrique GOMEZ - Saif GHRIBI - Ramzi HAMDI - Ahlem JOUIDI - Leandro NASCIMIENTO**
+**Authors: Angelo CANESSO - Enrique GOMEZ - Saif Eddine GHRIBI - Ramzi HAMDI - Ahlem JOUIDI - Leandro NASCIMIENTO**
 
 Here we propose a challenge, that is to predict the subventions allocated by the Parisian townhouse to a given project. The description of the challenge and the data is available in the notebook. The data are available at https://opendata.paris.fr/explore/dataset/subventions-accordees-et-refusees.
 
