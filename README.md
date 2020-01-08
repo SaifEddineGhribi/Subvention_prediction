@@ -1,8 +1,13 @@
-# RAMP starting kit on the prediction of subventions allocated to projects in Paris
+# RAMP starting kit on the prediction of grants allocated to projects in Paris
 
-**Authors: Angelo CANESSO - Enrique GOMEZ - Saif GHRIBI - Ramzi HAMDI - Ahlem JOUIDI - Leandro NASCIMIENTO**
+**Authors:**
+**Angelo CANESSO - Enrique GOMEZ - Saif GHRIBI**
+**Ramzi HAMDI - Ahlem JOUIDI - Leandro NASCIMIENTO**
 
-Here we propose a challenge, that is to predict the subventions allocated by the Parisian townhouse to a given project. The description of the challenge and the data is available in the notebook. The data are available at https://opendata.paris.fr/explore/dataset/subventions-accordees-et-refusees.
+
+Associations are an important part of French population's lives. In fact, one half of the French over 18 years old takes part of at least one association. Either cultural, educative of sportive, an association needs funds and one of the most repanded ways of get them is by applying for public grants.
+
+Here we propose a challenge, that is to predict the grants allocated by Paris to associations. The description of the challenge is available in the notebook. The data and its description is available at https://opendata.paris.fr/explore/dataset/subventions-accordees-et-refusees.
 
 
 
@@ -23,10 +28,10 @@ This starting kit requires Python and the following dependencies:
 
 We include in our repository the following files to work on the challenge.
 
-* [PSP_starting_kit.ipynb](PSP_starting_kit.ipynb): To get started with the challenge. Find descriptions, graphs and basic pre-processing of the features. Use the following command from the root directory to run it:
+* [PGP_starting_kit.ipynb](PGP_starting_kit.ipynb): To get started with the challenge. Find descriptions, graphs and basic pre-processing of the features. Use the following command from the root directory to run it:
   
   ```bash
-  $ jupyter-notebook PSP_starting_kit.ipynb
+  $ jupyter-notebook PGP_starting_kit.ipynb
   ```
 
 * [download_data.py](download_data.py): Use this python script to download the dataset for this challenge. By default, it will store the files on the directory [data](data).
