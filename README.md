@@ -1,8 +1,12 @@
 # RAMP starting kit on the prediction of grants allocated to projects in Paris
 
+<<<<<<< HEAD
 **Authors:**
 **Angelo CANESSO - Enrique GOMEZ - Saif GHRIBI**
 **Ramzi HAMDI - Ahlem JOUIDI - Leandro NASCIMIENTO**
+=======
+**Authors: Angelo CANESSO - Enrique GOMEZ - Saif Eddine GHRIBI - Ramzi HAMDI - Ahlem JOUIDI - Leandro NASCIMIENTO**
+>>>>>>> 0b42697efbbb6afb6e57af00a9d6eb39f01e5aef
 
 
 Associations are an important part of French population's lives. In fact, one half of the French over 18 years old takes part of at least one association. Either cultural, educative of sportive, an association needs funds and one of the most repanded ways of get them is by applying for public grants.
