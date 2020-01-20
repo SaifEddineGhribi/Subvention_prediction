@@ -1,11 +1,11 @@
-# RAMP starting kit on the prediction of grants allocated to projects in Paris
+# RAMP starting kit on the Parisian associations grant prediction
 
 **Authors:**
 **Angelo CANESSO - Enrique GOMEZ - Saif GHRIBI**
 **Ramzi HAMDI - Ahlem JOUIDI - Leandro NASCIMIENTO**
 
 
-Associations are an important part of French population's lives. In fact, one half of the French over 18 years old takes part of at least one association. Either cultural, educative of sportive, an association needs funds and one of the most repanded ways of get them is by applying for public grants.
+Associations are an important part of French population's lives. In fact, one half of the French takes part of at least one association. Either cultural, educative of sportive, an association needs funds and one of the most repanded ways of get them is by applying for public grants.
 
 Here we propose a challenge, that is to predict the grants allocated by Paris to associations. The description of the challenge is available in the notebook. The data and its description is available at https://opendata.paris.fr/explore/dataset/subventions-accordees-et-refusees.
 
