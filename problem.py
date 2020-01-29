@@ -40,7 +40,6 @@ class FAN_error(BaseScoreType):
             return f1_score(y_pred, y_test, average="weighted")
 
         def regression_metric(y_pred, y_test, tol=.05):
-            n = y_pred.shape[0]
             diff = np.abs(y_pred - y_test)
             mean = np.abs(y_pred + y_test) / 2
             ratio = diff / mean
@@ -52,7 +51,7 @@ class FAN_error(BaseScoreType):
         def metric_model(y_pred_reg, y_test_reg, y_pred_class, y_test_class, alpha_class=0.5, alpha_reg=0.5,tol=.05):
             reg_score = regression_metric(y_pred_reg, y_test_reg, tol=tol)
             class_score = classification_metric(y_pred_class, y_test_class)
-            return alpha_class * class_score + alpha_reg*reg_score
+            return alpha_class * (1 - class_score) + alpha_reg*reg_score
 
         score = metric_model(y_pred_reg, y_test_reg, y_pred_class, y_test_class, alpha_class=0.5, alpha_reg=0.5)
 
