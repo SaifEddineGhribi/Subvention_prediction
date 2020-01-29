@@ -14,23 +14,22 @@ _target_column_name = 'montant vote'
 Predictions = rw.prediction_types.make_regression()
 # An object implementing the workflow
 
-class FAN(FeatureExtractorRegressor):
+class wflow(FeatureExtractorRegressor):
     def __init__(self, workflow_element_names=[
             'feature_extractor', 'regressor', 'subventions-accordees-et-refusees.csv']):
-        super(FAN, self).__init__(workflow_element_names[:2])
+        super(wflow, self).__init__(workflow_element_names[:2])
         self.element_names = workflow_element_names
 
-workflow = FAN()
+workflow = wflow()
 
 # define the score (specific score for the FAN problem)
-class FAN_error(BaseScoreType):
-    is_lower_the_better = True
+class model_metric(BaseScoreType):
+    is_lower_the_better = False
     minimum = 0.0
     maximum = float('inf')
 
-    def __init__(self, name='fan error', precision=2):
+    def __init__(self, name='full model score'):
         self.name = name
-        self.precision = precision
 
     def __call__(self, y_pred_reg, y_test_reg, y_pred_class, y_test_class):
         if isinstance(y_true, pd.Series):
@@ -48,22 +47,25 @@ class FAN_error(BaseScoreType):
 
             return np.mean(ratio)
 
-        def metric_model(y_pred_reg, y_test_reg, y_pred_class, y_test_class, alpha_class=0.5, alpha_reg=0.5,tol=.05):
-            reg_score = regression_metric(y_pred_reg, y_test_reg, tol=tol)
+        def metric_model(y_pred, y_test):
+            y_pred_class, y_pred_reg = y_pred[:, 0], y_pred[:, 1]
+            y_test_class, y_test_reg = y_test[:, 0], y_test[:, 1]
+            alpha_class, alpha_reg = 0.6, 0.4
+            reg_score = regression_metric(y_pred_reg, y_test_reg)
             class_score = classification_metric(y_pred_class, y_test_class)
-            return alpha_class * (1 - class_score) + alpha_reg*reg_score
+            return alpha_class * (1-class_score) + alpha_reg*reg_score
 
         score = metric_model(y_pred_reg, y_test_reg, y_pred_class, y_test_class, alpha_class=0.5, alpha_reg=0.5)
 
         return score
 
 score_types = [
-    FAN_error(name='fan error', precision=2),
+    model_metric(name='full model score'),
 ]
 
 def get_cv(X, y):
     cv = GroupShuffleSplit(n_splits=8, test_size=0.20, random_state=42)
-    return cv.split(X,y, groups=X['Legal_ID'])
+    return cv.split(X,y, groups=X['Numéro de dossier'])
 
 def _read_data(path, f_name):
     data = pd.read_csv(os.path.join(path, 'data', f_name), low_memory=False,

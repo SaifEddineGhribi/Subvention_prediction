@@ -37,7 +37,6 @@ class FeatureExtractor(object):
  
         self.preprocessor = preprocessor
         self.preprocessor.fit(X_df, y_array)
-        # print(self.preprocessor.get_feature_names())
         return self
  
     def transform(self, X_df):
