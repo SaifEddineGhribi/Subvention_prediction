@@ -31,7 +31,7 @@ class model_metric(BaseScoreType):
     def __init__(self, name='full model score'):
         self.name = name
 
-    def __call__(self, y_pred_reg, y_test_reg, y_pred_class, y_test_class):
+    def __call__(self, y_pred, y_test):
         if isinstance(y_true, pd.Series):
             y_true = y_true.values
 
@@ -48,14 +48,14 @@ class model_metric(BaseScoreType):
             return np.mean(ratio)
 
         def metric_model(y_pred, y_test):
-            y_pred_class, y_pred_reg = y_pred[:, 0], y_pred[:, 1]
-            y_test_class, y_test_reg = y_test[:, 0], y_test[:, 1]
+            y_pred_class, y_pred_reg = y_pred[:len(y_test)], y_pred[len(y_test):]
+            y_test_class, y_test_reg = y_test[:len(y_test)], y_test[len(y_test):]
             alpha_class, alpha_reg = 0.6, 0.4
             reg_score = regression_metric(y_pred_reg, y_test_reg)
             class_score = classification_metric(y_pred_class, y_test_class)
             return alpha_class * (1-class_score) + alpha_reg*reg_score
 
-        score = metric_model(y_pred_reg, y_test_reg, y_pred_class, y_test_class, alpha_class=0.5, alpha_reg=0.5)
+        score = metric_model(y_pred, y_test)
 
         return score
 
