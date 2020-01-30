@@ -5,3 +5,4 @@ scikit-learn>=0.20
 matplotlib
 jupyter
 joblib
+category_encoders

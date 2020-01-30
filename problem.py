@@ -88,25 +88,8 @@ class rev_F1_score(BaseScoreType):
         return 1 - F1_score(y_true, y_pred, average="weighted")
 
 
-class MAE(BaseScoreType):
-    is_lower_the_better = True
-    minimum = 0.0
-    maximum = 1
-
-    def __init__(self, name='mare', precision=2):
-        self.name = name
-        self.precision = precision
-
-    def __call__(self, y_true, y_pred):
-        diff = np.abs(y_pred - y_true)
-        mean = np.abs(y_pred + y_true) / 2
-        ratio = diff / mean
-        mask = ratio < tol
-        ratio[mask] = 0
-        return np.mean(ratio)
-
 score_clf = rev_F1_score('f1')
-score_reg = MAE('MAE')
+score_reg = rw.score_types.MARE(name='mare', precision=2)
 final_score = [
     #Combination with 0.6, 0.4
     rw.score_types.Combined(

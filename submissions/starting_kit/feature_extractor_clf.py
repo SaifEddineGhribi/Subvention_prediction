@@ -1,5 +1,4 @@
-
-from sklearn.preprocessing import OrdinalEncoder
+from category_encoders.ordinal import OrdinalEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import make_pipeline
 from sklearn.impute import SimpleImputer
@@ -55,7 +54,7 @@ class FeatureExtractor():
        
         preprocessor = ColumnTransformer(transformers=[
                                                       ('col', make_pipeline(colectivite_transformer, OrdinalEncoder(), SimpleImputer(strategy='median')), collectivite),
-                                                      ('annee', make_pipeline(annee_transformer, SimpleImputer(strategy='median')), annee),
+                                                      ('annee', make_pipeline(annee_transformer, OrdinalEncoder(strategy='median')), annee),
                                                       ('dir', make_pipeline(direction_transformer, OrdinalEncoder(),SimpleImputer(strategy='median')), direction),
                                                       # ('nature', make_pipeline(nature_transformer, OrdinalEncoder(),SimpleImputer(strategy='median')), nature),
                                                       # ('beneficiaire', make_pipeline(beneficiaire_transformer, OrdinalEncoder(),SimpleImputer(strategy='median')), beneficiaire),

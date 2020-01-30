@@ -1,5 +1,4 @@
-
-from sklearn.preprocessing import OrdinalEncoder
+from category_encoders.ordinal import OrdinalEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import make_pipeline
 from sklearn.impute import SimpleImputer
