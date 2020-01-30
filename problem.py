@@ -27,37 +27,41 @@ class model_metric(BaseScoreType):
     is_lower_the_better = False
     minimum = 0.0
     maximum = float('inf')
-
+    
     def __init__(self, name='full model score'):
         self.name = name
-
+    
     def __call__(self, y_pred, y_test):
         if isinstance(y_test, pd.Series):
             y_test = y_test.values
-
+    
         def classification_metric(y_pred, y_test):
             return f1_score(y_pred, y_test, average="weighted")
-
+        
         def regression_metric(y_pred, y_test, tol=.05):
+            print('score', np.shape(y_pred), np.shape(y_test))
             diff = np.abs(y_pred - y_test)
             mean = np.abs(y_pred + y_test) / 2
             ratio = diff / mean
             mask = ratio < tol
             ratio[mask] = 0
-
             return np.mean(ratio)
-
+        
         def metric_model(y_pred, y_test):
             y_pred_class, y_pred_reg = y_pred[:len(y_test)], y_pred[len(y_test):]
-            idx = np.where
-            y_test_class, y_test_reg = y_test[:len(y_test)], y_test[len(y_test):]
+            idx = np.where(y_pred_class == 0)[0]
+            y_class_test = y_test[:len(y_test)].copy()
+            y_class_test[y_class_test > 0] = 1
+            y_test_class, y_test_reg = y_test[:len(y_test)], y_test[idx]
             alpha_class, alpha_reg = 0.6, 0.4
             reg_score = regression_metric(y_pred_reg, y_test_reg)
             class_score = classification_metric(y_pred_class, y_test_class)
+            print('Classification score :',class_score )
+            print('Regression score : ', reg_score)
             return alpha_class * (1-class_score) + alpha_reg*reg_score
-
+        
         score = metric_model(y_pred, y_test)
-
+        
         return score
 
 score_types = [
@@ -66,7 +70,7 @@ score_types = [
 
 def get_cv(X, y):
     cv = GroupShuffleSplit(n_splits=8, test_size=0.20, random_state=42)
-    return cv.split(X,y, groups=X['Numéro de dossier'])
+    return cv.split(X,y, groups=X['numDoc'])
 
 def _read_data(path, f_name):
     data = pd.read_csv(os.path.join(path, 'data', f_name), low_memory=False,
