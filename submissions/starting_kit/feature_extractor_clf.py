@@ -13,6 +13,8 @@ class FeatureExtractor():
 
     def fit(self, X_df, y):
 
+        print('train', np.shape(X_df), np.shape(y))
+
         collectivite = 'collectivite'
         annee = 'anneeBudg'
         obj = 'objet du dossier'
@@ -67,4 +69,6 @@ class FeatureExtractor():
         return self
 
     def transform(self, X_df):
+
+      print('transform', np.shape(X_df))
       return self.preprocessor.transform(X_df)
