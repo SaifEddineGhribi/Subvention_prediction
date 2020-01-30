@@ -49,6 +49,7 @@ class model_metric(BaseScoreType):
 
         def metric_model(y_pred, y_test):
             y_pred_class, y_pred_reg = y_pred[:len(y_test)], y_pred[len(y_test):]
+            idx = np.where
             y_test_class, y_test_reg = y_test[:len(y_test)], y_test[len(y_test):]
             alpha_class, alpha_reg = 0.6, 0.4
             reg_score = regression_metric(y_pred_reg, y_test_reg)
