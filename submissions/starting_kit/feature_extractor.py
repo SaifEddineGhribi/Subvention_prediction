@@ -1,44 +1,71 @@
-import os
-import pandas as pd
-import numpy as np
-from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OrdinalEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import make_pipeline
+from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import FunctionTransformer
-from sklearn.pipeline import Pipeline
-import recordlinkage
-import category_encoders as ce
- 
-class FeatureExtractor(object):
+import numpy as np
+
+
+class FeatureExtractor():
     def __init__(self):
         pass
+
+    def fit(self, X_df, y):
+
+      collectivite = 'collectivite'
+      annee = 'anneeBudg'
+      obj = 'objet du dossier'
+      direction = 'direction'
+      nature = 'Nature de la subvention'
+      beneficiaire = 'beneficiaire'
+      secteur = 'secteur activite'
+      drop_cols = ["numDoc", "siret"]
  
-    def fit(self, X_df, y_array):
-        def numDoc(X_df):
-            # X_df['numDoc'] = X_df['numDoc'][4:]
-        preprocessor = ColumnTransformer(
-            transformers=[
-                ('zipcode', make_pipeline(zipcode_transformer,
-                 SimpleImputer(strategy='median')), zipcode_col),
-                ('tezip',te,target_cols),
-                ('hc',make_pipeline(headCounter,
-                SimpleImputer(strategy='median')),hc_cols),
-                ('num', numeric_transformer, num_cols),
-                ('agee', age_calc, year_col),
-                ('date', make_pipeline(date_transformer,
-                SimpleImputer(strategy='median')), date_cols),
-                ('APE', make_pipeline(APE_transformer,
-                SimpleImputer(strategy='median')), APE_col),
-                ('merge', make_pipeline(merge_transformer,
-                SimpleImputer(strategy='median')), merge_col),
-                ('drop cols', 'drop', drop_cols),
-                ])
- 
- 
-        self.preprocessor = preprocessor
-        self.preprocessor.fit(X_df, y_array)
-        return self
- 
+
+      def colect(X):
+        return X.values[:, np.newaxis]
+      colectivite_transformer = FunctionTransformer(colect, validate=False)
+
+      def objetdoss(X):
+        return X_df[obj].values[:, np.newaxis]
+      obj_transformer = FunctionTransformer(objetdoss, validate=False)
+
+      def direct(X):
+        return X_df[direction].values[:, np.newaxis]
+      direction_transformer = FunctionTransformer(direct, validate=False)
+
+      def nature_t(X):
+        return X_df[nature].values[:, np.newaxis]
+      nature_transformer = FunctionTransformer(nature_t, validate=False)
+
+      def beneficiaire_t(X):
+        return X_df[beneficiaire].values[:, np.newaxis]
+      beneficiaire_transformer = FunctionTransformer(beneficiaire_t, validate=False)
+
+      def secteur_t(X):
+        return X_df[secteur].values[:, np.newaxis]
+      secteur_transformer = FunctionTransformer(secteur_t, validate=False)
+
+      def annee_t(X):
+        return X_df[annee].values[:, np.newaxis]
+      annee_transformer = FunctionTransformer(annee_t, validate=False)
+
+      preprocessor = ColumnTransformer(transformers=[
+        #('col', make_pipeline(colectivite_transformer, OrdinalEncoder(), SimpleImputer(strategy='median')), collectivite),
+            ('annee',make_pipeline(annee_transformer, SimpleImputer(strategy='median')), annee), 
+            #('dir', make_pipeline(direction_transformer, OrdinalEncoder(),SimpleImputer(strategy='median')), direction),
+            #('nature', make_pipeline(nature_transformer, OrdinalEncoder(),SimpleImputer(strategy='median')), nature),
+            #('beneficiaire', make_pipeline(beneficiaire_transformer, OrdinalEncoder(),SimpleImputer(strategy='median')), beneficiaire),
+            #('sect', make_pipeline(secteur_transformer, OrdinalEncoder(),SimpleImputer(strategy='median')), secteur),
+            #('obj', make_pipeline(obj_transformer, OrdinalEncoder() ,SimpleImputer(strategy='median')), obj),
+            ('drop cols', 'drop', drop_cols),
+            ])
+
+      self.preprocessor = preprocessor
+      self.preprocessor.fit(X_df, y)
+
+      return self
+
     def transform(self, X_df):
         X_array = self.preprocessor.transform(X_df)
         # print(X_array[0:10])

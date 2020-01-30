@@ -1,23 +1,26 @@
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.base import BaseEstimator
-import xgboost as xgb
 from sklearn import preprocessing
+import numpy as np
 
 
-from sklearn.model_selection import GridSearchCV
+
 class Regressor(BaseEstimator):
     def __init__(self):
-        self.reg = xgb.XGBRegressor(base_score=0.5, booster='gbtree', colsample_bylevel=1,
-             colsample_bynode=1, colsample_bytree=0.7, gamma=0,
-             importance_type='gain', learning_rate=0.07, max_delta_step=0,
-             max_depth=30, min_child_weight=4, missing=None, n_estimators=10,
-             n_jobs=-1, nthread=None, objective='reg:squarederror',
-             random_state=0, reg_alpha=0, reg_lambda=1, scale_pos_weight=1,
-             seed=None, silent=1, subsample=0.7, verbosity=1)
-
+        self.clf = RandomForestClassifier()
+        self.reg = RandomForestRegressor()
+    
     def fit(self, X, y):
-        self.reg.fit(X, y)
-
-    def predict(self, X):
-        # print(self.reg.feature_importances_)
-        return self.reg.predict(X)
+        self.clf.fit(X, y)
+        idx = np.where(y > 0)[0]
+        y_reg = y[idx]
+        X_reg = X[idx, :]
+        self.reg.fit(X_reg, y_reg)
+    
+    def predict_proba(self, X):
+        pred1 = self.clf.predict(X)
+        idx = np.where(pred1 == 0)[0]
+        X_reg = X[idx, :]
+        pred2 = self.reg.predict(X_reg)
+        return np.concatenate((pred1, pred2), axis=None)
