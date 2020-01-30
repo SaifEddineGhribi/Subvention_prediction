@@ -32,8 +32,8 @@ class model_metric(BaseScoreType):
         self.name = name
 
     def __call__(self, y_pred, y_test):
-        if isinstance(y_true, pd.Series):
-            y_true = y_true.values
+        if isinstance(y_test, pd.Series):
+            y_test = y_test.values
 
         def classification_metric(y_pred, y_test):
             return f1_score(y_pred, y_test, average="weighted")
