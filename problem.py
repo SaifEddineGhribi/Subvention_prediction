@@ -6,7 +6,7 @@ from rampwf.workflows import FeatureExtractorRegressor
 from rampwf.workflows import FeatureExtractorClassifier
 from rampwf.score_types.base import BaseScoreType
 from sklearn.model_selection import GroupShuffleSplit
-from sklearn.metrics import accuracy_score, confusion_matrix,f1_score
+from sklearn.metrics import  r2_score, f1_score
 
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -75,40 +75,34 @@ class clfreg(object):
 
 workflow = clfreg()
 
-class rev_F1_score(BaseScoreType):
-    is_lower_the_better = True
+class F1_score(BaseScoreType):
+    is_lower_the_better = False
     minimum = 0.0
     maximum = 1.0
 
-    def __init__(self, name='reverse f1', precision=2):
+    def __init__(self, name='f1', precision=2):
         self.name = name
         self.precision = precision
 
     def __call__(self, y_true, y_pred):
         labels = np.argmax(y_pred, axis=1)
-        return 1 - f1_score(y_true[:,0], labels, average="weighted")
+        return f1_score(y_true[:,0], labels, average="weighted")
 
-class MAEN(BaseScoreType):
-    is_lower_the_better = True
-    minimum = 0.0
+class R2_score(BaseScoreType):
+    is_lower_the_better = False
+    minimum = -float('inf')
     maximum = 1.0
 
-    def __init__(self, name='MAEN', precision=2):
+    def __init__(self, name='r2', precision=2):
         self.name = name
         self.precision = precision
 
     def __call__(self, y_true, y_pred):
-        pred_idx = np.where(y_pred >= 0)[0]
-        diff = np.abs(y_pred[pred_idx] - y_true[pred_idx, :])
-        mean = np.abs(y_pred[pred_idx] + y_true[pred_idx]) / 2
-        ratio = diff / mean
-        mask = ratio < 0.05
-        ratio[mask] = 0
-        return np.mean(ratio)
+        return r2_score(y_true, y_pred)
 
 
-score_clf = rev_F1_score()
-score_reg = MAEN()
+score_clf = F1_score()
+score_reg = R2_score()
 
 score_types = [
     #Combination with 0.6, 0.4
