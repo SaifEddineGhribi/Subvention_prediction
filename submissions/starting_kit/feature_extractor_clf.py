@@ -12,8 +12,6 @@ class FeatureExtractor():
 
     def fit(self, X_df, y):
 
-        print('train', np.shape(X_df), np.shape(y))
-
         collectivite = 'collectivite'
         annee = 'anneeBudg'
         obj = 'objet du dossier'
@@ -54,7 +52,7 @@ class FeatureExtractor():
        
         preprocessor = ColumnTransformer(transformers=[
                                                       ('col', make_pipeline(colectivite_transformer, OrdinalEncoder(), SimpleImputer(strategy='median')), collectivite),
-                                                      ('annee', make_pipeline(annee_transformer, OrdinalEncoder(strategy='median')), annee),
+                                                      ('annee', make_pipeline(annee_transformer, SimpleImputer(strategy='median')), annee),
                                                       ('dir', make_pipeline(direction_transformer, OrdinalEncoder(),SimpleImputer(strategy='median')), direction),
                                                       # ('nature', make_pipeline(nature_transformer, OrdinalEncoder(),SimpleImputer(strategy='median')), nature),
                                                       # ('beneficiaire', make_pipeline(beneficiaire_transformer, OrdinalEncoder(),SimpleImputer(strategy='median')), beneficiaire),
@@ -68,6 +66,4 @@ class FeatureExtractor():
         return self
 
     def transform(self, X_df):
-
-      print('transform', np.shape(X_df))
       return self.preprocessor.transform(X_df)
