@@ -5,7 +5,7 @@ import rampwf as rw
 from rampwf.workflows import FeatureExtractorRegressor
 from rampwf.workflows import FeatureExtractorClassifier
 from rampwf.score_types.base import BaseScoreType
-from sklearn.model_selection import GroupShuffleSplit
+from sklearn.model_selection import ShuffleSplit
 from sklearn.metrics import accuracy_score, confusion_matrix,f1_score
 
 
@@ -40,10 +40,12 @@ class clfreg(object):
         # Avoid setting with copy warning
         X_train_df = X_df.iloc[train_is].copy()
         y_train_array = y_array[train_is]
-        idx = np.where(y_train_array > 0)[0]
-        y_train_clf = y_train_array.copy()
-        y_train_reg = y_train_array.copy()
-        y_train_clf[idx] = 1
+
+        y_train_clf = y_train_array[:, 0].copy()
+        y_train_reg = y_train_array[:, 1].copy()
+
+        idx = np.where(y_train_reg > 0)[0]
+
         y_train_reg = y_train_reg[idx]
 
         fe_clf, clf = self.feature_extractor_classifier_workflow.\
@@ -62,17 +64,12 @@ class clfreg(object):
         X_df = X_df.copy()
         # get only subventioned label idx
         pred_idx = np.where(y_pred_clf != 0)[0]
-        print('pred idx = ',pred_idx.shape)
         y_pred_reg = np.full(y_pred_clf.shape, np.nan)
         y_pred_reg[pred_idx] = self.feature_extractor_regressor_workflow.\
             test_submission((fe_reg, reg), X_df.loc[pred_idx, :])
-        ret = np.concatenate([y_pred_clf.reshape(-1, 1), y_pred_reg.reshape(-1, 1)], axis=1)
-        print('ret sh = ',ret.shape)
         return np.concatenate([y_pred_clf.reshape(-1, 1), y_pred_reg.reshape(-1, 1)], axis=1)
 
-
 workflow = clfreg()
-
 
 class rev_F1_score(BaseScoreType):
     is_lower_the_better = True
@@ -120,14 +117,20 @@ score_types = [
 ]
 
 def get_cv(X, y):
-    cv = GroupShuffleSplit(n_splits=8, test_size=0.20, random_state=42)
-    return cv.split(X,y, groups=X['numDoc'])
+    cv = ShuffleSplit(n_splits=8, test_size=0.20, random_state=42)
+    return cv.split(X)
 
 def _read_data(path, f_name):
     data = pd.read_csv(os.path.join(path, 'data', f_name), low_memory=False,
                        compression='zip')
     y_array = data[_target_column_name].values
     X_df = data.drop(_target_column_name, axis=1)
+
+    y_reg_array = y_array.copy()
+    y_clf_array = y_array.copy()
+    y_clf_array[y_clf_array > 0 ] = 1 
+    y_array = np.concatenate([y_clf_array.reshape(-1,1), y_reg_array.reshape(-1,1)], axis=1)
+
     return X_df, y_array
 
 def get_train_data(path='.'):
