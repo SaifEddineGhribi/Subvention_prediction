@@ -5,8 +5,11 @@ import rampwf as rw
 from rampwf.workflows import FeatureExtractorRegressor
 from rampwf.workflows import FeatureExtractorClassifier
 from rampwf.score_types.base import BaseScoreType
-from sklearn.model_selection import ShuffleSplit
+from sklearn.model_selection import GroupShuffleSplit
 from sklearn.metrics import accuracy_score, confusion_matrix,f1_score
+
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 
 problem_title = 'Parisian associations grants prediction challenge'
@@ -62,12 +65,13 @@ class clfreg(object):
             test_submission((fe_clf, clf), X_df)
         # Avoid setting with copy warning
         X_df = X_df.copy()
+        labels = np.argmax(y_pred_clf, axis=1)
         # get only subventioned label idx
-        pred_idx = np.where(y_pred_clf != 0)[0]
-        y_pred_reg = np.full(y_pred_clf.shape, np.nan)
+        pred_idx = np.where(labels != 0)[0]
+        y_pred_reg = np.full((len(y_pred_clf),), -1)
         y_pred_reg[pred_idx] = self.feature_extractor_regressor_workflow.\
             test_submission((fe_reg, reg), X_df.loc[pred_idx, :])
-        return np.concatenate([y_pred_clf.reshape(-1, 1), y_pred_reg.reshape(-1, 1)], axis=1)
+        return np.concatenate([y_pred_clf, y_pred_reg.reshape(-1, 1)], axis=1)
 
 workflow = clfreg()
 
@@ -81,8 +85,8 @@ class rev_F1_score(BaseScoreType):
         self.precision = precision
 
     def __call__(self, y_true, y_pred):
-        print('rev_F1_score')
-        return 1 - f1_score(y_true, y_pred, average="weighted")
+        labels = np.argmax(y_pred, axis=1)
+        return 1 - f1_score(y_true[:,0], labels, average="weighted")
 
 class MAEN(BaseScoreType):
     is_lower_the_better = True
@@ -94,9 +98,8 @@ class MAEN(BaseScoreType):
         self.precision = precision
 
     def __call__(self, y_true, y_pred):
-        print('y_pred sha = ',y_pred.shape)
-        pred_idx = np.where(y_pred != np.nan)[0]
-        diff = np.abs(y_pred[pred_idx] - y_true[pred_idx])
+        pred_idx = np.where(y_pred >= 0)[0]
+        diff = np.abs(y_pred[pred_idx] - y_true[pred_idx, :])
         mean = np.abs(y_pred[pred_idx] + y_true[pred_idx]) / 2
         ratio = diff / mean
         mask = ratio < 0.05
@@ -117,8 +120,8 @@ score_types = [
 ]
 
 def get_cv(X, y):
-    cv = ShuffleSplit(n_splits=8, test_size=0.20, random_state=42)
-    return cv.split(X)
+    cv = GroupShuffleSplit(n_splits=8, test_size=0.20, random_state=42)
+    return cv.split(X, y, groups=X['numDoc'])
 
 def _read_data(path, f_name):
     data = pd.read_csv(os.path.join(path, 'data', f_name), low_memory=False,
