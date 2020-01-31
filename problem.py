@@ -62,9 +62,12 @@ class clfreg(object):
         X_df = X_df.copy()
         # get only subventioned label idx
         pred_idx = np.where(y_pred_clf != 0)[0]
-
-        y_pred_reg = self.feature_extractor_regressor_workflow.\
+        print('pred idx = ',pred_idx.shape)
+        y_pred_reg = np.full(y_pred_clf.shape, np.nan)
+        y_pred_reg[pred_idx] = self.feature_extractor_regressor_workflow.\
             test_submission((fe_reg, reg), X_df.loc[pred_idx, :])
+        ret = np.concatenate([y_pred_clf.reshape(-1, 1), y_pred_reg.reshape(-1, 1)], axis=1)
+        print('ret sh = ',ret.shape)
         return np.concatenate([y_pred_clf.reshape(-1, 1), y_pred_reg.reshape(-1, 1)], axis=1)
 
 
@@ -81,7 +84,8 @@ class rev_F1_score(BaseScoreType):
         self.precision = precision
 
     def __call__(self, y_true, y_pred):
-        return 1 - F1_score(y_true, y_pred, average="weighted")
+        print('rev_F1_score')
+        return 1 - f1_score(y_true, y_pred, average="weighted")
 
 class MAEN(BaseScoreType):
     is_lower_the_better = True
@@ -93,11 +97,12 @@ class MAEN(BaseScoreType):
         self.precision = precision
 
     def __call__(self, y_true, y_pred):
-        n = y_pred.shape[0]
-        diff = np.abs(y_pred - y_true)
-        mean = np.abs(y_pred + y_true) / 2
+        print('y_pred sha = ',y_pred.shape)
+        pred_idx = np.where(y_pred != np.nan)[0]
+        diff = np.abs(y_pred[pred_idx] - y_true[pred_idx])
+        mean = np.abs(y_pred[pred_idx] + y_true[pred_idx]) / 2
         ratio = diff / mean
-        mask = ratio < tol
+        mask = ratio < 0.05
         ratio[mask] = 0
         return np.mean(ratio)
 

@@ -45,11 +45,11 @@ class FeatureExtractor():
         def secteur_t(X):
            return X.values[:, np.newaxis]
         secteur_transformer = FunctionTransformer(secteur_t, validate=False)
-                                                       
+
         def annee_t(X):
              return X.values[:, np.newaxis]
         annee_transformer = FunctionTransformer(annee_t, validate=False)
-       
+
         preprocessor = ColumnTransformer(transformers=[
                                                       ('col', make_pipeline(colectivite_transformer, OrdinalEncoder(), SimpleImputer(strategy='median')), collectivite),
                                                       ('annee', make_pipeline(annee_transformer, SimpleImputer(strategy='median')), annee),
@@ -60,7 +60,7 @@ class FeatureExtractor():
                                                       # ('obj', make_pipeline(obj_transformer, OrdinalEncoder() ,SimpleImputer(strategy='median')), obj),
                                                       ('drop cols', 'drop', drop_cols),
                                                       ])
-           
+
         self.preprocessor = preprocessor
         self.preprocessor.fit(X_df, y)
         return self
