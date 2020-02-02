@@ -46,11 +46,11 @@ class clfreg(object):
 
         y_train_clf = y_train_array[:, 0].copy()
         y_train_reg = y_train_array[:, 1].copy()
-        print('X_train_df is =',X_train_df.shape)
+        #print('X_train_df is =',X_train_df.shape)
         idx = np.where(y_train_reg > 0)[0]
-        print('1 = ',y_train_reg.shape)
+        #print('1 = ',y_train_reg.shape)
         y_train_reg = y_train_reg[idx]
-        print('2 = ',y_train_reg.shape)
+        #print('2 = ',y_train_reg.shape)
 
         fe_clf, clf = self.feature_extractor_classifier_workflow.\
             train_submission(module_path, X_train_df, y_train_clf)
@@ -82,7 +82,7 @@ class F1_score(BaseScoreType):
     minimum = 0.0
     maximum = 1.0
 
-    def __init__(self, name='f1', precision=2):
+    def __init__(self, name='f1', precision=4):
         self.name = name
         self.precision = precision
 
@@ -90,9 +90,9 @@ class F1_score(BaseScoreType):
         # print('f1 pred = ',y_pred)
         # print('f1 true = ',y_true[:,0])
         labels = np.argmax(y_pred, axis=1)
-        print(len(labels))
+        #print(len(labels))
         # print('lab = ',labels)
-        return f1_score(y_true[:,0], labels, average="weighted")
+        return f1_score(y_true[:,0], labels)
 
 class R2_score(BaseScoreType):
     is_lower_the_better = False
