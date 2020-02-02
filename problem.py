@@ -70,7 +70,7 @@ class clfreg(object):
         labels = np.argmax(y_pred_clf, axis=1)
         # get only subventioned label idx
         pred_idx = np.where(labels != 0)[0]
-        y_pred_reg = np.full((y_pred_clf.shape[0],), np.NINF)
+        y_pred_reg = np.full((y_pred_clf.shape[0],), -1)
         y_pred_reg[pred_idx] = self.feature_extractor_regressor_workflow.\
             test_submission((fe_reg, reg), X_df.loc[pred_idx, :])
         return np.concatenate([y_pred_clf, y_pred_reg.reshape(-1, 1)], axis=1)
@@ -107,7 +107,7 @@ class R2_score(BaseScoreType):
         # print('r2 y pred sh =',y_pred[:25,0])
         # print('r2 y true sh =',y_true[:25])
         y_pred2 = y_pred[:,0]
-        idx = np.where(y_pred2 != np.NINF)[0]
+        idx = np.where(y_pred2 != -1)[0]
         y_true2 = y_true[idx]
         # print('r2 y true sh =',y_true2.shape)
         y_pred3 = y_pred2[idx]
