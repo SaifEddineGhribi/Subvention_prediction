@@ -89,8 +89,8 @@ class F1_score(BaseScoreType):
     def __call__(self, y_true, y_pred):
         # print('f1 pred = ',y_pred)
         # print('f1 true = ',y_true[:,0])
-        y_pred2 = y_pred[:,:2]
-        labels = np.argmax(y_pred2, axis=1)
+        labels = np.argmax(y_pred, axis=1)
+        print(len(labels))
         # print('lab = ',labels)
         return f1_score(y_true[:,0], labels, average="weighted")
 
