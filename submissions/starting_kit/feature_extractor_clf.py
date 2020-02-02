@@ -54,10 +54,10 @@ class FeatureExtractor():
                                                       ('col', make_pipeline(colectivite_transformer, OrdinalEncoder(), SimpleImputer(strategy='median')), collectivite),
                                                       ('annee', make_pipeline(annee_transformer, SimpleImputer(strategy='median')), annee),
                                                       ('dir', make_pipeline(direction_transformer, OrdinalEncoder(),SimpleImputer(strategy='median')), direction),
-                                                      # ('nature', make_pipeline(nature_transformer, OrdinalEncoder(),SimpleImputer(strategy='median')), nature),
-                                                      # ('beneficiaire', make_pipeline(beneficiaire_transformer, OrdinalEncoder(),SimpleImputer(strategy='median')), beneficiaire),
-                                                      # ('sect', make_pipeline(secteur_transformer, OrdinalEncoder(),SimpleImputer(strategy='median')), secteur),
-                                                      # ('obj', make_pipeline(obj_transformer, OrdinalEncoder() ,SimpleImputer(strategy='median')), obj),
+                                                      ('nature', make_pipeline(nature_transformer, OrdinalEncoder(),SimpleImputer(strategy='median')), nature),
+                                                      ('beneficiaire', make_pipeline(beneficiaire_transformer, OrdinalEncoder(),SimpleImputer(strategy='median')), beneficiaire),
+                                                      ('sect', make_pipeline(secteur_transformer, OrdinalEncoder(),SimpleImputer(strategy='median')), secteur),
+                                                      ('obj', make_pipeline(obj_transformer, OrdinalEncoder() ,SimpleImputer(strategy='median')), obj),
                                                       ('drop cols', 'drop', drop_cols),
                                                       ])
 
