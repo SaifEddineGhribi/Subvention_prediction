@@ -42,14 +42,15 @@ class clfreg(object):
             train_is = slice(None, None, None)
         # Avoid setting with copy warning
         X_train_df = X_df.iloc[train_is].copy()
-        y_train_array = y_array[train_is]
+        y_train_array = y_array[train_is].copy()
 
         y_train_clf = y_train_array[:, 0].copy()
         y_train_reg = y_train_array[:, 1].copy()
-
+        print('X_train_df is =',X_train_df.shape)
         idx = np.where(y_train_reg > 0)[0]
-
+        print('1 = ',y_train_reg.shape)
         y_train_reg = y_train_reg[idx]
+        print('2 = ',y_train_reg.shape)
 
         fe_clf, clf = self.feature_extractor_classifier_workflow.\
             train_submission(module_path, X_train_df, y_train_clf)
@@ -63,12 +64,13 @@ class clfreg(object):
         fe_clf, clf, fe_reg, reg = trained_model
         y_pred_clf = self.feature_extractor_classifier_workflow.\
             test_submission((fe_clf, clf), X_df)
+        # print('y pred clf sh = ',y_pred_clf.shape)
         # Avoid setting with copy warning
         X_df = X_df.copy()
         labels = np.argmax(y_pred_clf, axis=1)
         # get only subventioned label idx
         pred_idx = np.where(labels != 0)[0]
-        y_pred_reg = np.full((len(y_pred_clf),), -1)
+        y_pred_reg = np.full((y_pred_clf.shape[0],), np.NINF)
         y_pred_reg[pred_idx] = self.feature_extractor_regressor_workflow.\
             test_submission((fe_reg, reg), X_df.loc[pred_idx, :])
         return np.concatenate([y_pred_clf, y_pred_reg.reshape(-1, 1)], axis=1)
@@ -85,7 +87,11 @@ class F1_score(BaseScoreType):
         self.precision = precision
 
     def __call__(self, y_true, y_pred):
-        labels = np.argmax(y_pred, axis=1)
+        # print('f1 pred = ',y_pred)
+        # print('f1 true = ',y_true[:,0])
+        y_pred2 = y_pred[:,:2]
+        labels = np.argmax(y_pred2, axis=1)
+        # print('lab = ',labels)
         return f1_score(y_true[:,0], labels, average="weighted")
 
 class R2_score(BaseScoreType):
@@ -98,7 +104,14 @@ class R2_score(BaseScoreType):
         self.precision = precision
 
     def __call__(self, y_true, y_pred):
-        return r2_score(y_true, y_pred)
+        # print('r2 y pred sh =',y_pred[:25,0])
+        # print('r2 y true sh =',y_true[:25])
+        y_pred2 = y_pred[:,0]
+        idx = np.where(y_pred2 != np.NINF)[0]
+        y_true2 = y_true[idx]
+        # print('r2 y true sh =',y_true2.shape)
+        y_pred3 = y_pred2[idx]
+        return r2_score(y_true2, y_pred3)
 
 
 score_clf = F1_score()
