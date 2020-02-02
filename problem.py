@@ -67,18 +67,25 @@ class clfreg(object):
         # print('y pred clf sh = ',y_pred_clf.shape)
         # Avoid setting with copy warning
         X_df = X_df.copy()
+        
         labels = np.argmax(y_pred_clf, axis=1)
+    
         # get only subventioned label idx
         pred_idx = np.where(labels != 0)[0]
         y_pred_reg = np.full((y_pred_clf.shape[0],), -1)
-        y_pred_reg[pred_idx] = self.feature_extractor_regressor_workflow.\
-            test_submission((fe_reg, reg), X_df.loc[pred_idx, :])
+        
+        ##X_df2[pred_idx, :] = X_df.iloc[pred_idx, :].values
+        y_temp = self.feature_extractor_regressor_workflow.\
+            test_submission((fe_reg, reg), X_df)
+
+        y_pred_reg[pred_idx] = y_temp[pred_idx]
+
         return np.concatenate([y_pred_clf, y_pred_reg.reshape(-1, 1)], axis=1)
 
 workflow = clfreg()
 
 class F1_score(BaseScoreType):
-    is_lower_the_better = False
+    is_lower_the_better = True
     minimum = 0.0
     maximum = 1.0
 
@@ -90,28 +97,32 @@ class F1_score(BaseScoreType):
         # print('f1 pred = ',y_pred)
         # print('f1 true = ',y_true[:,0])
         labels = np.argmax(y_pred, axis=1)
+        #print('f1', labels[:100], len(labels))
         #print(len(labels))
         # print('lab = ',labels)
-        return f1_score(y_true[:,0], labels)
+        return 1-f1_score(y_true[:,0], labels)
 
 class R2_score(BaseScoreType):
-    is_lower_the_better = False
-    minimum = -float('inf')
-    maximum = 1.0
+    is_lower_the_better = True
+    minimum = 0.0
+    maximum = float('inf')
 
-    def __init__(self, name='r2', precision=2):
+    def __init__(self, name='fan error', precision=2):
         self.name = name
         self.precision = precision
 
     def __call__(self, y_true, y_pred):
-        # print('r2 y pred sh =',y_pred[:25,0])
-        # print('r2 y true sh =',y_true[:25])
-        y_pred2 = y_pred[:,0]
-        idx = np.where(y_pred2 != -1)[0]
-        y_true2 = y_true[idx]
-        # print('r2 y true sh =',y_true2.shape)
-        y_pred3 = y_pred2[idx]
-        return r2_score(y_true2, y_pred3)
+        idx = np.where(y_pred > -1)[0]
+
+        if isinstance(y_true, pd.Series):
+            y_true = y_true.values
+
+        max_true = np.maximum(5., np.log10(np.maximum(1., y_true[idx])))
+        max_pred = np.maximum(5., np.log10(np.maximum(1., y_pred[idx])))
+        
+        loss = np.mean(np.abs(max_true - max_pred))
+        
+        return loss
 
 
 score_clf = F1_score()
