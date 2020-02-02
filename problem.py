@@ -16,7 +16,7 @@ problem_title = 'Parisian associations grants prediction challenge'
 
 _target_column_name = 'montant vote'
 # Label for binary classification
-_prediction_label_names = [0, 1]
+_prediction_label_names = [1, 0]
 
 # We first need a classifier
 Predictions_1 = rw.prediction_types.make_multiclass(label_names=_prediction_label_names)
